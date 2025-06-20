@@ -10,13 +10,14 @@ function secondsToMinutesSecond(seconds) {
   return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
 }
 
-async function getSongs(folder) {
+async function getSongs(folder, updateUI = true) {
   currFolder = folder;
   let response = await fetch(`/${folder}/info.json`);
   let playlistData = await response.json();
 
   // Extract song filenames
   songs = playlistData.songs.map(song => typeof song === "string" ? song : song.filename);
+  if(!updateUI) return songs;
 
   let songUL = document.querySelector(".songlist ul");
   songUL.innerHTML = "";
@@ -92,15 +93,15 @@ async function displayAlbums() {
   document.querySelectorAll(".card").forEach((card) => {
     card.addEventListener("click", async () => {
       const folder = card.dataset.folder;
-      songs = await getSongs(folder);
+      songs = await getSongs(folder, false);
       if (songs.length > 0) playMusic(songs[0]);
     });
   });
 }
 
 
-async function main() {
-  await getSongs("library");
+async function main() { 
+  await getSongs("library", true);
   playMusic(songs[0], true);
   displayAlbums();
 
@@ -161,6 +162,18 @@ next.addEventListener("click", () => {
       document.querySelector(".range input").value = 20;
     }
   });
+  //Autoplay next song
+  currentSong.addEventListener("ended", () => {
+  let current = decodeURIComponent(currentSong.src.split("/").pop());
+  let index = songs.indexOf(current);
+  if (index < songs.length - 1) {
+    playMusic(songs[index + 1]);
+  }
+  else {
+    playMusic(songs[0]);
+  }
+});
+
 }
 
 main();
