@@ -1,4 +1,3 @@
-// Main script for loading playlists and library from info.json (Netlify-compatible)
 
 let currentSong = new Audio();
 let songs = [];
@@ -134,16 +133,18 @@ async function main() {
   });
 
   previous.addEventListener("click", () => {
-    currentSong.pause();
-    let index = songs.indexOf(currentSong.src.split("/").pop());
-    if (index > 0) playMusic(songs[index - 1]);
-  });
+  currentSong.pause();
+  let current = decodeURIComponent(currentSong.src.split("/").pop());
+  let index = songs.indexOf(current);
+  if (index > 0) playMusic(songs[index - 1]);
+});
 
-  next.addEventListener("click", () => {
-    currentSong.pause();
-    let index = songs.indexOf(currentSong.src.split("/").pop());
-    if (index < songs.length - 1) playMusic(songs[index + 1]);
-  });
+next.addEventListener("click", () => {
+  currentSong.pause();
+  let current = decodeURIComponent(currentSong.src.split("/").pop());
+  let index = songs.indexOf(current);
+  if (index < songs.length - 1) playMusic(songs[index + 1]);
+});
 
   document.querySelector(".range input").addEventListener("input", (e) => {
     currentSong.volume = parseInt(e.target.value) / 100;
